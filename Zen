@@ -1,210 +1,194 @@
--- UI Setup
-local player = game.Players.LocalPlayer
-local mouse = player:GetMouse()
+-- UI + Functional Script for Grow a Garden
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "GrowAGardenUI"
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui", CoreGui)
+screenGui.Name = "ZenUI"
+screenGui.ResetOnSpawn = false
 
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 420, 0, 400)
-frame.Position = UDim2.new(0.3, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
+-- Main Frame
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 400, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = true
+mainFrame.Active = true
+mainFrame.Draggable = true
 
-local UICorner = Instance.new("UICorner", frame)
-UICorner.CornerRadius = UDim.new(0, 8)
+-- UI Corner
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 8)
 
--- Minimize and Close
-local closeBtn = Instance.new("TextButton", frame)
-closeBtn.Text = "X"
-closeBtn.Size = UDim2.new(0, 40, 0, 30)
-closeBtn.Position = UDim2.new(1, -45, 0, 5)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
+-- Title Bar
+local titleBar = Instance.new("Frame", mainFrame)
+titleBar.Size = UDim2.new(1, 0, 0, 30)
+titleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 8)
 
-local minBtn = Instance.new("TextButton", frame)
-minBtn.Text = "-"
-minBtn.Size = UDim2.new(0, 40, 0, 30)
-minBtn.Position = UDim2.new(1, -90, 0, 5)
-minBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
-minBtn.TextColor3 = Color3.new(1, 1, 1)
+-- Title Text
+local titleText = Instance.new("TextLabel", titleBar)
+titleText.Text = "Zen - Grow A Garden"
+titleText.Size = UDim2.new(1, -30, 1, 0)
+titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextXAlignment = Enum.TextXAlignment.Left
+titleText.Font = Enum.Font.GothamBold
+titleText.TextSize = 16
 
-local contentFrame = Instance.new("Frame", frame)
-contentFrame.Position = UDim2.new(0, 0, 0, 40)
-contentFrame.Size = UDim2.new(1, 0, 1, -40)
-contentFrame.BackgroundTransparency = 1
+-- Close Button
+local closeButton = Instance.new("TextButton", titleBar)
+closeButton.Size = UDim2.new(0, 30, 1, 0)
+closeButton.Position = UDim2.new(1, -30, 0, 0)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+closeButton.BackgroundTransparency = 1
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 18
 
--- UI Animation
-minBtn.MouseButton1Click:Connect(function()
-	contentFrame.Visible = not contentFrame.Visible
-end)
-closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
-end)
+-- Tab Buttons
+local tabButtons = Instance.new("Frame", mainFrame)
+tabButtons.Position = UDim2.new(0, 0, 0, 30)
+tabButtons.Size = UDim2.new(0, 100, 1, -30)
+tabButtons.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", tabButtons).CornerRadius = UDim.new(0, 6)
 
--- UI Layouts
-local tabLayout = Instance.new("UIListLayout", contentFrame)
-tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-tabLayout.Padding = UDim.new(0, 15)
+-- Tab Content
+local tabContent = Instance.new("Frame", mainFrame)
+tabContent.Position = UDim2.new(0, 100, 0, 30)
+tabContent.Size = UDim2.new(1, -100, 1, -30)
+tabContent.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+tabContent.Name = "Content"
 
--- Auto Farms Section
-local autoFarmsFrame = Instance.new("Frame", contentFrame)
-autoFarmsFrame.Size = UDim2.new(1, -20, 0, 160)
-autoFarmsFrame.Position = UDim2.new(0, 10, 0, 10)
-autoFarmsFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-autoFarmsFrame.BorderSizePixel = 0
+local function createTab(name)
+	local button = Instance.new("TextButton", tabButtons)
+	button.Size = UDim2.new(1, 0, 0, 40)
+	button.Text = name
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.Gotham
+	button.TextSize = 14
+	button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 
-local farmsLabel = Instance.new("TextLabel", autoFarmsFrame)
-farmsLabel.Text = "Auto Farms"
-farmsLabel.Size = UDim2.new(1, 0, 0, 25)
-farmsLabel.BackgroundTransparency = 1
-farmsLabel.TextColor3 = Color3.new(1, 1, 1)
-farmsLabel.Font = Enum.Font.GothamSemibold
-farmsLabel.TextSize = 18
+	local content = Instance.new("Frame", tabContent)
+	content.Size = UDim2.new(1, 0, 1, 0)
+	content.Visible = false
+	content.Name = name
+	content.BackgroundTransparency = 1
 
-local fruitToggle = Instance.new("TextButton", autoFarmsFrame)
-fruitToggle.Text = "Auto Collect Fruit"
-fruitToggle.Size = UDim2.new(0, 180, 0, 30)
-fruitToggle.Position = UDim2.new(0, 10, 0, 35)
-fruitToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-fruitToggle.TextColor3 = Color3.new(1, 1, 1)
-fruitToggle.Font = Enum.Font.Gotham
-fruitToggle.TextSize = 14
-
-local fruitInput = Instance.new("TextBox", autoFarmsFrame)
-fruitInput.PlaceholderText = "Type fruit name"
-fruitInput.Size = UDim2.new(0, 180, 0, 30)
-fruitInput.Position = UDim2.new(0, 10, 0, 70)
-fruitInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-fruitInput.TextColor3 = Color3.new(1, 1, 1)
-fruitInput.Font = Enum.Font.Gotham
-fruitInput.TextSize = 14
-
--- Dropdown for matches
-local dropdownFrame = Instance.new("Frame", autoFarmsFrame)
-dropdownFrame.Size = UDim2.new(0, 180, 0, 100)
-dropdownFrame.Position = UDim2.new(0, 10, 0, 105)
-dropdownFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-dropdownFrame.BorderSizePixel = 0
-dropdownFrame.Visible = false
-dropdownFrame.ClipsDescendants = true
-
-local uiList = Instance.new("UIListLayout", dropdownFrame)
-uiList.Padding = UDim.new(0, 4)
-uiList.SortOrder = Enum.SortOrder.LayoutOrder
-
-local fruitName = ""
-
-local function updateDropdown(text)
-	dropdownFrame:ClearAllChildren()
-	uiList.Parent = dropdownFrame
-	local found = {}
-	for _, item in pairs(workspace:GetDescendants()) do
-		if item:IsA("Tool") and item:FindFirstChild("Handle") then
-			local name = item.Name
-			if name:lower():find(text:lower()) then
-				found[name] = true
-			end
+	button.MouseButton1Click:Connect(function()
+		for _, v in pairs(tabContent:GetChildren()) do
+			if v:IsA("Frame") then v.Visible = false end
 		end
-	end
-	local count = 0
-	for name in pairs(found) do
-		count += 1
-		local opt = Instance.new("TextButton", dropdownFrame)
-		opt.Size = UDim2.new(1, 0, 0, 24)
-		opt.Text = name
-		opt.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-		opt.TextColor3 = Color3.new(1, 1, 1)
-		opt.Font = Enum.Font.Gotham
-		opt.TextSize = 14
-		opt.BorderSizePixel = 0
-		opt.MouseButton1Click:Connect(function()
-			fruitName = name
-			fruitInput.Text = name
-			dropdownFrame.Visible = false
-		end)
-	end
-	dropdownFrame.Visible = count > 0
+		content.Visible = true
+	end)
+
+	return content
 end
 
-fruitInput:GetPropertyChangedSignal("Text"):Connect(function()
-	updateDropdown(fruitInput.Text)
-end)
-fruitInput.FocusLost:Connect(function()
-	task.delay(0.3, function()
-		dropdownFrame.Visible = false
+-- Tabs
+local farmTab = createTab("Auto Farms")
+local shopTab = createTab("Shop")
+
+farmTab.Visible = true -- Default tab
+
+-- Toggle utility
+local function createToggle(parent, name, callback)
+	local toggle = Instance.new("TextButton", parent)
+	toggle.Size = UDim2.new(1, -10, 0, 30)
+	toggle.Position = UDim2.new(0, 5, 0, #parent:GetChildren() * 35)
+	toggle.Text = "[OFF] " .. name
+	toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	toggle.TextColor3 = Color3.new(1, 1, 1)
+	toggle.Font = Enum.Font.Gotham
+	toggle.TextSize = 14
+
+	local state = false
+	toggle.MouseButton1Click:Connect(function()
+		state = not state
+		toggle.Text = (state and "[ON] " or "[OFF] ") .. name
+		if callback then callback(state) end
 	end)
+end
+
+-- Button utility
+local function createButton(parent, name, callback)
+	local button = Instance.new("TextButton", parent)
+	button.Size = UDim2.new(1, -10, 0, 30)
+	button.Position = UDim2.new(0, 5, 0, #parent:GetChildren() * 35)
+	button.Text = name
+	button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.Gotham
+	button.TextSize = 14
+	button.MouseButton1Click:Connect(callback)
+end
+
+-- Auto Farms Toggles
+createToggle(farmTab, "Auto Collect Fruit", function(state)
+	-- add your auto collect logic
 end)
 
--- Auto Sell
-local sellToggle = Instance.new("TextButton", autoFarmsFrame)
-sellToggle.Text = "Auto Sell"
-sellToggle.Size = UDim2.new(0, 180, 0, 30)
-sellToggle.Position = UDim2.new(0, 210, 0, 35)
-sellToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-sellToggle.TextColor3 = Color3.new(1, 1, 1)
-sellToggle.Font = Enum.Font.Gotham
-sellToggle.TextSize = 14
-
--- Shop Section
-local shopFrame = Instance.new("Frame", contentFrame)
-shopFrame.Size = UDim2.new(1, -20, 0, 120)
-shopFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-shopFrame.BorderSizePixel = 0
-
-local shopLabel = Instance.new("TextLabel", shopFrame)
-shopLabel.Text = "Shop"
-shopLabel.Size = UDim2.new(1, 0, 0, 25)
-shopLabel.BackgroundTransparency = 1
-shopLabel.TextColor3 = Color3.new(1, 1, 1)
-shopLabel.Font = Enum.Font.GothamSemibold
-shopLabel.TextSize = 18
-
-local seedToggle = Instance.new("TextButton", shopFrame)
-seedToggle.Text = "Seed Shop"
-seedToggle.Size = UDim2.new(0, 180, 0, 30)
-seedToggle.Position = UDim2.new(0, 10, 0, 35)
-seedToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-seedToggle.TextColor3 = Color3.new(1, 1, 1)
-
-local gearToggle = Instance.new("TextButton", shopFrame)
-gearToggle.Text = "Gear Shop"
-gearToggle.Size = UDim2.new(0, 180, 0, 30)
-gearToggle.Position = UDim2.new(0, 210, 0, 35)
-gearToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-gearToggle.TextColor3 = Color3.new(1, 1, 1)
-
--- Button Logic
-fruitToggle.MouseButton1Click:Connect(function()
-	while wait(1) do
-		if not gui or fruitName == "" then break end
-		for _, item in pairs(workspace:GetDescendants()) do
-			if item:IsA("Tool") and item.Name == fruitName then
-				firetouchinterest(player.Character.HumanoidRootPart, item.Handle, 0)
-				firetouchinterest(player.Character.HumanoidRootPart, item.Handle, 1)
+createToggle(farmTab, "Auto Sell", function(state)
+	if state then
+		local char = LocalPlayer.Character
+		if char then
+			char:MoveTo(Vector3.new(100, 5, 50)) -- example position of Sell Shop
+			wait(1)
+			for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
+				if item:IsA("Tool") then
+					item:Activate() -- simulate selling
+					wait(0.2)
+				end
 			end
 		end
 	end
 end)
 
-sellToggle.MouseButton1Click:Connect(function()
-	while wait(1) do
-		for _, v in pairs(player.Backpack:GetChildren()) do
-			if v:IsA("Tool") then
-				v.Parent = workspace
-			end
-		end
+createToggle(farmTab, "Dupe Seeds", function(state)
+	-- implement seed duplication logic
+end)
+
+createButton(farmTab, "Limited Fruit", function()
+	-- give robux seeds
+end)
+
+-- Shop Toggles
+createToggle(shopTab, "Seed Shop", function(state)
+	if state then
+		-- open seed shop UI remotely
+		game:GetService("ReplicatedStorage"):WaitForChild("OpenSeedShop"):FireServer()
 	end
 end)
 
-seedToggle.MouseButton1Click:Connect(function()
-	local event = workspace:FindFirstChild("SeedShopRemote") or workspace:FindFirstChild("RemoteEvents"):FindFirstChild("SeedShopRemote")
-	if event then event:FireServer() end
+createToggle(shopTab, "Gear Shop", function(state)
+	if state then
+		-- open gear shop UI remotely
+		game:GetService("ReplicatedStorage"):WaitForChild("OpenGearShop"):FireServer()
+	end
 end)
 
-gearToggle.MouseButton1Click:Connect(function()
-	local event = workspace:FindFirstChild("GearShopRemote") or workspace:FindFirstChild("RemoteEvents"):FindFirstChild("GearShopRemote")
-	if event then event:FireServer() end
+-- Zen Button (hidden until X is clicked)
+local zenButton = Instance.new("TextButton", screenGui)
+zenButton.Size = UDim2.new(0, 60, 0, 30)
+zenButton.Position = UDim2.new(0, 10, 0.5, 0)
+zenButton.Text = "Zen"
+zenButton.Visible = false
+zenButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+zenButton.TextColor3 = Color3.new(1, 1, 1)
+zenButton.Font = Enum.Font.GothamBold
+zenButton.TextSize = 14
+zenButton.Active = true
+zenButton.Draggable = true
+
+zenButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = true
+	zenButton.Visible = false
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = false
+	zenButton.Visible = true
 end)
