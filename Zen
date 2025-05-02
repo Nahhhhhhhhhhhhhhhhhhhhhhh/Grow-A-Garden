@@ -1,0 +1,210 @@
+-- UI Setup
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "GrowAGardenUI"
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 420, 0, 400)
+frame.Position = UDim2.new(0.3, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local UICorner = Instance.new("UICorner", frame)
+UICorner.CornerRadius = UDim.new(0, 8)
+
+-- Minimize and Close
+local closeBtn = Instance.new("TextButton", frame)
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 40, 0, 30)
+closeBtn.Position = UDim2.new(1, -45, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+
+local minBtn = Instance.new("TextButton", frame)
+minBtn.Text = "-"
+minBtn.Size = UDim2.new(0, 40, 0, 30)
+minBtn.Position = UDim2.new(1, -90, 0, 5)
+minBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+
+local contentFrame = Instance.new("Frame", frame)
+contentFrame.Position = UDim2.new(0, 0, 0, 40)
+contentFrame.Size = UDim2.new(1, 0, 1, -40)
+contentFrame.BackgroundTransparency = 1
+
+-- UI Animation
+minBtn.MouseButton1Click:Connect(function()
+	contentFrame.Visible = not contentFrame.Visible
+end)
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+-- UI Layouts
+local tabLayout = Instance.new("UIListLayout", contentFrame)
+tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+tabLayout.Padding = UDim.new(0, 15)
+
+-- Auto Farms Section
+local autoFarmsFrame = Instance.new("Frame", contentFrame)
+autoFarmsFrame.Size = UDim2.new(1, -20, 0, 160)
+autoFarmsFrame.Position = UDim2.new(0, 10, 0, 10)
+autoFarmsFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+autoFarmsFrame.BorderSizePixel = 0
+
+local farmsLabel = Instance.new("TextLabel", autoFarmsFrame)
+farmsLabel.Text = "Auto Farms"
+farmsLabel.Size = UDim2.new(1, 0, 0, 25)
+farmsLabel.BackgroundTransparency = 1
+farmsLabel.TextColor3 = Color3.new(1, 1, 1)
+farmsLabel.Font = Enum.Font.GothamSemibold
+farmsLabel.TextSize = 18
+
+local fruitToggle = Instance.new("TextButton", autoFarmsFrame)
+fruitToggle.Text = "Auto Collect Fruit"
+fruitToggle.Size = UDim2.new(0, 180, 0, 30)
+fruitToggle.Position = UDim2.new(0, 10, 0, 35)
+fruitToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+fruitToggle.TextColor3 = Color3.new(1, 1, 1)
+fruitToggle.Font = Enum.Font.Gotham
+fruitToggle.TextSize = 14
+
+local fruitInput = Instance.new("TextBox", autoFarmsFrame)
+fruitInput.PlaceholderText = "Type fruit name"
+fruitInput.Size = UDim2.new(0, 180, 0, 30)
+fruitInput.Position = UDim2.new(0, 10, 0, 70)
+fruitInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+fruitInput.TextColor3 = Color3.new(1, 1, 1)
+fruitInput.Font = Enum.Font.Gotham
+fruitInput.TextSize = 14
+
+-- Dropdown for matches
+local dropdownFrame = Instance.new("Frame", autoFarmsFrame)
+dropdownFrame.Size = UDim2.new(0, 180, 0, 100)
+dropdownFrame.Position = UDim2.new(0, 10, 0, 105)
+dropdownFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+dropdownFrame.BorderSizePixel = 0
+dropdownFrame.Visible = false
+dropdownFrame.ClipsDescendants = true
+
+local uiList = Instance.new("UIListLayout", dropdownFrame)
+uiList.Padding = UDim.new(0, 4)
+uiList.SortOrder = Enum.SortOrder.LayoutOrder
+
+local fruitName = ""
+
+local function updateDropdown(text)
+	dropdownFrame:ClearAllChildren()
+	uiList.Parent = dropdownFrame
+	local found = {}
+	for _, item in pairs(workspace:GetDescendants()) do
+		if item:IsA("Tool") and item:FindFirstChild("Handle") then
+			local name = item.Name
+			if name:lower():find(text:lower()) then
+				found[name] = true
+			end
+		end
+	end
+	local count = 0
+	for name in pairs(found) do
+		count += 1
+		local opt = Instance.new("TextButton", dropdownFrame)
+		opt.Size = UDim2.new(1, 0, 0, 24)
+		opt.Text = name
+		opt.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+		opt.TextColor3 = Color3.new(1, 1, 1)
+		opt.Font = Enum.Font.Gotham
+		opt.TextSize = 14
+		opt.BorderSizePixel = 0
+		opt.MouseButton1Click:Connect(function()
+			fruitName = name
+			fruitInput.Text = name
+			dropdownFrame.Visible = false
+		end)
+	end
+	dropdownFrame.Visible = count > 0
+end
+
+fruitInput:GetPropertyChangedSignal("Text"):Connect(function()
+	updateDropdown(fruitInput.Text)
+end)
+fruitInput.FocusLost:Connect(function()
+	task.delay(0.3, function()
+		dropdownFrame.Visible = false
+	end)
+end)
+
+-- Auto Sell
+local sellToggle = Instance.new("TextButton", autoFarmsFrame)
+sellToggle.Text = "Auto Sell"
+sellToggle.Size = UDim2.new(0, 180, 0, 30)
+sellToggle.Position = UDim2.new(0, 210, 0, 35)
+sellToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sellToggle.TextColor3 = Color3.new(1, 1, 1)
+sellToggle.Font = Enum.Font.Gotham
+sellToggle.TextSize = 14
+
+-- Shop Section
+local shopFrame = Instance.new("Frame", contentFrame)
+shopFrame.Size = UDim2.new(1, -20, 0, 120)
+shopFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+shopFrame.BorderSizePixel = 0
+
+local shopLabel = Instance.new("TextLabel", shopFrame)
+shopLabel.Text = "Shop"
+shopLabel.Size = UDim2.new(1, 0, 0, 25)
+shopLabel.BackgroundTransparency = 1
+shopLabel.TextColor3 = Color3.new(1, 1, 1)
+shopLabel.Font = Enum.Font.GothamSemibold
+shopLabel.TextSize = 18
+
+local seedToggle = Instance.new("TextButton", shopFrame)
+seedToggle.Text = "Seed Shop"
+seedToggle.Size = UDim2.new(0, 180, 0, 30)
+seedToggle.Position = UDim2.new(0, 10, 0, 35)
+seedToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+seedToggle.TextColor3 = Color3.new(1, 1, 1)
+
+local gearToggle = Instance.new("TextButton", shopFrame)
+gearToggle.Text = "Gear Shop"
+gearToggle.Size = UDim2.new(0, 180, 0, 30)
+gearToggle.Position = UDim2.new(0, 210, 0, 35)
+gearToggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+gearToggle.TextColor3 = Color3.new(1, 1, 1)
+
+-- Button Logic
+fruitToggle.MouseButton1Click:Connect(function()
+	while wait(1) do
+		if not gui or fruitName == "" then break end
+		for _, item in pairs(workspace:GetDescendants()) do
+			if item:IsA("Tool") and item.Name == fruitName then
+				firetouchinterest(player.Character.HumanoidRootPart, item.Handle, 0)
+				firetouchinterest(player.Character.HumanoidRootPart, item.Handle, 1)
+			end
+		end
+	end
+end)
+
+sellToggle.MouseButton1Click:Connect(function()
+	while wait(1) do
+		for _, v in pairs(player.Backpack:GetChildren()) do
+			if v:IsA("Tool") then
+				v.Parent = workspace
+			end
+		end
+	end
+end)
+
+seedToggle.MouseButton1Click:Connect(function()
+	local event = workspace:FindFirstChild("SeedShopRemote") or workspace:FindFirstChild("RemoteEvents"):FindFirstChild("SeedShopRemote")
+	if event then event:FireServer() end
+end)
+
+gearToggle.MouseButton1Click:Connect(function()
+	local event = workspace:FindFirstChild("GearShopRemote") or workspace:FindFirstChild("RemoteEvents"):FindFirstChild("GearShopRemote")
+	if event then event:FireServer() end
+end)
